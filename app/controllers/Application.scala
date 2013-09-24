@@ -1,11 +1,8 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws.WS
-import scala.concurrent._
-import play.api.libs.concurrent.Execution.Implicits._
-import javax.naming.ServiceUnavailableException
+import play.api.mvc._
 
 object Application extends Controller {
 
@@ -19,7 +16,9 @@ object Application extends Controller {
       response.status match {
         case 200 => Ok(response.body)
         case _ => ServiceUnavailable(response.body)
-      })
+      }).recover {
+      case ex: Throwable => BadRequest
+    }
   }
 
   def saveData = Action.async(parse.json) {

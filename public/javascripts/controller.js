@@ -2,10 +2,10 @@
 
 function ClientCtrl($scope, $http) {
 
-    var masterServer = "http://localhost:9000";
+    var clientServer = "http://localhost:9000";
 
     $scope.getImage = function () {
-        $http({method: 'GET', url: masterServer + '/image'}).
+        $http({method: 'GET', url: clientServer + '/image'}).
             success(function (data, status, headers, config) {
                 $scope.currentImage = data.id
             }).
