@@ -9,11 +9,12 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "org.webjars" %% "webjars-play" % "2.2.0",
-    "org.webjars" % "angularjs" % "1.2.0rc1",
+    "org.webjars" % "angularjs" % "1.2.0-rc.3",
     "org.webjars" % "bootstrap" % "2.3.2")
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
-      // Add your own project settings here      
-  )
+  lazy val imageCommon = RootProject(file("../ImageCommon/"))
 
+  val main = play.Project(appName, appVersion, appDependencies).settings( 
+      // Add your own project settings here      
+  ).aggregate(imageCommon).dependsOn(imageCommon)
 }

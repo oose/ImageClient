@@ -1,10 +1,16 @@
 "use strict";
 
+function getBaseURL () {
+	   return location.protocol + "//" + location.hostname + 
+	      (location.port && ":" + location.port) ;
+	}
+
 function ClientCtrl($scope, $http) {
 
-    var clientServer = "http://localhost:9000";
+    var clientServer = getBaseURL();
 
-    $scope.getImage = function () {
+    $scope.getImage = function () //noinspection UnterminatedStatementJS
+    {
         $http({method: 'GET', url: clientServer + '/image'}).
             success(function (data, status, headers, config) {
                 $scope.currentImage = data.id
@@ -35,6 +41,11 @@ function ClientCtrl($scope, $http) {
             $scope.tags.push($scope.tag)
             $scope.tag = ""
         }
+    }
+    
+    $scope.removeTag = function(index) {
+    	console.log("removing index " + index)
+    	$scope.tags.splice(index,1)
     }
 
     $scope.skip = function () {
