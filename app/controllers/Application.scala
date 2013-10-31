@@ -1,17 +1,17 @@
 package controllers
 
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.ws.WS
-import play.api.mvc._
 import scala.concurrent.Future
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.ws.Response
+import play.api.libs.ws.WS
+import play.api.mvc._
+
 import common.config.Configured
-import play.api.Play
-import common.config.Configuration
 import util.AppConfig
 
-object Application extends Controller  with Configured {
+object Application extends Controller with Configured {
 
   implicit class MasterServer(val url: String) extends AnyVal
 
@@ -19,9 +19,11 @@ object Application extends Controller  with Configured {
 
   implicit val url: MasterServer = appConfig.imageMaster
 
-  class ProxyAction[A](
-    ws: Request[A] => Future[Response], bodyParser: BodyParser[A] = parse.anyContent)(reply: Future[Response] => Future[SimpleResult])
+  class ProxyAction[A](bodyParser: BodyParser[A] = parse.anyContent)(ws: Request[A] => Future[Response], reply: Future[Response] => Future[SimpleResult])
     extends Action[A] {
+    /**
+     * compose the Action from the ws function and the reply function.
+     */
     def apply(request: Request[A]): Future[SimpleResult] = {
       (reply compose ws)(request)
     }
@@ -30,18 +32,30 @@ object Application extends Controller  with Configured {
   }
 
   object ProxyAction {
-    def apply[A](ws: Request[A] => Future[Response], bodyParser: BodyParser[A] = parse.anyContent)(reply: Future[Response] => Future[SimpleResult]) = new ProxyAction(ws, bodyParser)(reply)
+    def apply[A](bodyParser: BodyParser[A] = parse.anyContent, ws: Request[A] => Future[Response], reply: Future[Response] => Future[SimpleResult]) = new ProxyAction(bodyParser)(ws, reply)
   }
 
-  def getImage[A](request: Request[A])(implicit masterServer: MasterServer) = {
+  
+  /**
+   * make a GET request to the MasterServer /image URL.
+   * @see [[ProxyAction]]
+   */
+  private def getImage[A](request: Request[A])(implicit masterServer: MasterServer) = {
     WS.url(masterServer.url + "/image").get
   }
 
-  def postImage(request: Request[JsValue])(implicit masterServer: MasterServer) = {
+  /**
+   * make a POST request, obtaining the MasterServer reply from the /image URL.
+   * @see [[ProxyAction]]
+   */
+  private def postImage(request: Request[JsValue])(implicit masterServer: MasterServer) = {
     WS.url(masterServer.url + "/image").post(request.body)
   }
 
-  def response = {
+  /**
+   * Handle the response of a [[ProxyAction]].
+   */
+  private def response = {
     responseFut: Future[Response] =>
       responseFut.map(
         response =>
@@ -53,11 +67,21 @@ object Application extends Controller  with Configured {
         }
   }
 
+  /**
+   * display the UI view.
+   */
   def index = Action {
     Ok(views.html.index())
   }
 
-  def image = ProxyAction(getImage)(response)
+  /** 
+   *  request a new Image from the MasterServer.
+   *  
+   */
+  def image = ProxyAction(ws = getImage, reply = response)
 
-  def saveData = ProxyAction(postImage, parse.json)(response)
+  /**
+   *  save the image tags to the MasterServer.
+   */
+  def saveData = ProxyAction(parse.json, ws = postImage, reply = response)
 }

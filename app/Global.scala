@@ -1,6 +1,6 @@
-import play.api.GlobalSettings
+import play.api._
+
 import common.config.Configuration
-import play.api.Logger
 import util.AppConfig
 
 object Global extends GlobalSettings with Configuration {
