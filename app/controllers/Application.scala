@@ -1,15 +1,14 @@
 package controllers
 
 import scala.concurrent.Future
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.ws.Response
 import play.api.libs.ws.WS
 import play.api.mvc._
-
 import common.config.Configured
 import util.AppConfig
+import play.api.Routes
 
 object Application extends Controller with Configured {
 
@@ -35,7 +34,6 @@ object Application extends Controller with Configured {
     def apply[A](bodyParser: BodyParser[A] = parse.anyContent, ws: Request[A] => Future[Response], reply: Future[Response] => Future[SimpleResult]) = new ProxyAction(bodyParser)(ws, reply)
   }
 
-  
   /**
    * make a GET request to the MasterServer /image URL.
    * @see [[ProxyAction]]
@@ -74,9 +72,9 @@ object Application extends Controller with Configured {
     Ok(views.html.index())
   }
 
-  /** 
+  /**
    *  request a new Image from the MasterServer.
-   *  
+   *
    */
   def image = ProxyAction(ws = getImage, reply = response)
 
@@ -84,4 +82,11 @@ object Application extends Controller with Configured {
    *  save the image tags to the MasterServer.
    */
   def saveData = ProxyAction(parse.json, ws = postImage, reply = response)
+
+  def jsRoutes(varName: String = "jsRoutes") = Action { implicit request =>
+    Ok(
+      Routes.javascriptRouter(varName)(
+        routes.javascript.Application.image,
+        routes.javascript.Application.saveData)).as(JAVASCRIPT)
+  }
 }
