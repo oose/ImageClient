@@ -7,6 +7,7 @@ import play.api.libs.ws.Response
 import play.api.libs.ws.WS
 import play.api.mvc._
 import oose.play.config.Configured
+import oose.play.actions.ProxyAction
 import util.AppConfig
 import play.api.Routes
 
@@ -17,22 +18,6 @@ object Application extends Controller with Configured {
   lazy val appConfig = configured[AppConfig]
 
   implicit val url: MasterServer = appConfig.imageMaster
-
-  class ProxyAction[A](bodyParser: BodyParser[A] = parse.anyContent)(ws: Request[A] => Future[Response], reply: Future[Response] => Future[SimpleResult])
-    extends Action[A] {
-    /**
-     * compose the Action from the ws function and the reply function.
-     */
-    def apply(request: Request[A]): Future[SimpleResult] = {
-      (reply compose ws)(request)
-    }
-
-    def parser = bodyParser
-  }
-
-  object ProxyAction {
-    def apply[A](bodyParser: BodyParser[A] = parse.anyContent, ws: Request[A] => Future[Response], reply: Future[Response] => Future[SimpleResult]) = new ProxyAction(bodyParser)(ws, reply)
-  }
 
   /**
    * make a GET request to the MasterServer /image URL.
