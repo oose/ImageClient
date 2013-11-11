@@ -6,7 +6,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.ws.Response
 import play.api.libs.ws.WS
 import play.api.mvc._
-import common.config.Configured
+import oose.play.config.Configured
 import util.AppConfig
 import play.api.Routes
 
