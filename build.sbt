@@ -1,5 +1,7 @@
 name := "ImageClient"
 
+organization := "oose.play"
+
 version := "1.0-SNAPSHOT"
 
 resolvers += "oose (snapshots)" at "http://oose.github.io/m2/snapshots"
@@ -12,8 +14,13 @@ libraryDependencies ++= Seq(
     "oose.play" %% "config" % "1.0-SNAPSHOT",
     "oose.play" %% "actions" % "1.0-SNAPSHOT",
     "oose.play" %% "jsrouter" % "1.0-SNAPSHOT",
-    "com.typesafe.akka" %% "akka-testkit" % "2.2.0" % "test")
+    "com.typesafe.akka" %% "akka-testkit" % "2.2.0" % "test",
+    "org.specs2" % "classycle" % "1.4.1" % "test")
     
+requireJs += "main.js"
+
+requireJsShim += "main.js"
+
 play.Project.playScalaSettings
 
 
