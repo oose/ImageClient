@@ -14,38 +14,17 @@ define(["angular"], function (angular) {
                         $scope.currentImage = "http://placehold.it/350x350&text=Currently+no+images+available"
                         $scope.errors.push("Retrieving a new image failed.")
                     });
-                /*
-                 $http({method: 'GET', url: clientServer + '/image'}).
-                 success(function (data, status, headers, config) {
-                 $scope.currentImage = data.id
-                 }).
-                 error(function (data, status, headers, config) {
-                 $scope.currentImage = "http://placehold.it/350x350&text=Currently+no+images+available"
-                 $scope.errors.push("Retrieving a new image failed.")
-                 });
-                 */
             }
 
             $scope.submitImage = function () {
                 var postData = { tags: $scope.tags, id: $scope.currentImage}
 
-                playRoutes.controllers.Application.submitImage().post(postData)
+                playRoutes.controllers.Application.saveData().post(postData)
                     .success(function (data, status, headers, config) {
                         // $scope.users = data.users; // assign  $scope.persons here as promise is resolved here
                     }).error(function (data, status, headers, config) {
                         $scope.errors.push("Submit image failed.")
                     });
-                /* $http({
-                 url: '/image',
-                 method: "POST",
-                 data: postData,
-                 headers: {'Content-Type': 'application/json'}
-                 }).success(function (data, status, headers, config) {
-                 // $scope.users = data.users; // assign  $scope.persons here as promise is resolved here
-                 }).error(function (data, status, headers, config) {
-                 $scope.errors.push("Submit image failed.")
-                 });
-                 */
             }
 
 
