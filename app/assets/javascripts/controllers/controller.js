@@ -6,7 +6,7 @@ define(["angular"], function (angular) {
 
             $scope.getImage = function () {
 
-                playRoutes.controllers.Application.image().get()
+                playRoutes.controllers.Application.getImage().get()
                     .success(function (data, status, headers, config) {
                         $scope.currentImage = data.id
                     })
@@ -19,7 +19,7 @@ define(["angular"], function (angular) {
             $scope.submitImage = function () {
                 var postData = { tags: $scope.tags, id: $scope.currentImage}
 
-                playRoutes.controllers.Application.saveData().post(postData)
+                playRoutes.controllers.Application.postImage().post(postData)
                     .success(function (data, status, headers, config) {
                         // $scope.users = data.users; // assign  $scope.persons here as promise is resolved here
                     }).error(function (data, status, headers, config) {

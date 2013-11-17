@@ -8,7 +8,7 @@
     <title>Client</title>
     <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
     <link rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.png")'>
-    @requireJs(core = routes.WebJarAssets.requirejs.url, module = routes.Assets.at("javascripts/main.js").url)    
+    <script data-main='@routes.Assets.at("javascripts/main.js")' src='@routes.WebJarAssets.requirejs' type="text/javascript"></script>
 </head>
 <body ng-controller="ClientCtrl">
 

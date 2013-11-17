@@ -17,12 +17,7 @@ libraryDependencies ++= Seq(
     "com.typesafe.akka" %% "akka-testkit" % "2.2.0" % "test",
     "org.specs2" % "classycle" % "1.4.1" % "test")
     
-requireJs += "main.js"
-
-requireJsShim += "main.js"
-
 play.Project.playScalaSettings
-
 
 val ImageClient = project.in(file("."))
    

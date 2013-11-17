@@ -5,9 +5,9 @@
 # Home page
 GET    /                 controllers.Application.index
 
-GET    /image            controllers.Application.image
+GET    /image            controllers.Application.getImage
 
-POST   /image            controllers.Application.saveData
+POST   /image            controllers.Application.postImage
 
 GET    /webjars/*file    controllers.WebJarAssets.at(file)
 

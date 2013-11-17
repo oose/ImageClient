@@ -8,6 +8,7 @@ import play.api.libs.ws.WS
 import play.api.mvc._
 import oose.play.config.Configured
 import oose.play.actions.ProxyAction
+import oose.play.json.StatusMessage._
 import util.AppConfig
 import play.api.Routes
 
@@ -23,7 +24,7 @@ object Application extends Controller with Configured {
    * make a GET request to the MasterServer /image URL.
    * @see [[ProxyAction]]
    */
-  private def getImage[A](request: Request[A])(implicit masterServer: MasterServer) = {
+  private def getImageWS[A](request: Request[A])(implicit masterServer: MasterServer) = {
     WS.url(masterServer.url + "/image").get
   }
 
@@ -31,7 +32,7 @@ object Application extends Controller with Configured {
    * make a POST request, obtaining the MasterServer reply from the /image URL.
    * @see [[ProxyAction]]
    */
-  private def postImage(request: Request[JsValue])(implicit masterServer: MasterServer) = {
+  private def postImageToMaster(request: Request[JsValue])(implicit masterServer: MasterServer) = {
     WS.url(masterServer.url + "/image").post(request.body)
   }
 
@@ -40,13 +41,14 @@ object Application extends Controller with Configured {
    */
   private def response = {
     responseFut: Future[Response] =>
-      responseFut.map(
-        response =>
+      responseFut
+        .map(response =>
           response.status match {
             case 200 => Ok(response.body)
-            case _ => ServiceUnavailable(response.body)
-          }).recover {
-          case ex: Throwable => BadRequest
+            case _ => ServiceUnavailable(error(response.body))
+          })
+        .recover {
+          case ex: Throwable => BadRequest(error(s"Error from server ${ex.getMessage}"))
         }
   }
 
@@ -61,17 +63,17 @@ object Application extends Controller with Configured {
    *  request a new Image from the MasterServer.
    *
    */
-  def image = ProxyAction(ws = getImage, reply = response)
+  def getImage = ProxyAction(ws = getImageWS, reply = response)
 
   /**
    *  save the image tags to the MasterServer.
    */
-  def saveData = ProxyAction(parse.json, ws = postImage, reply = response)
+  def postImage = ProxyAction(parse.json, ws = postImageToMaster, reply = response)
 
   def jsRoutes(varName: String = "jsRoutes") = Action { implicit request =>
     Ok(
       Routes.javascriptRouter(varName)(
-        routes.javascript.Application.image,
-        routes.javascript.Application.saveData)).as(JAVASCRIPT)
+        routes.javascript.Application.getImage,
+        routes.javascript.Application.postImage)).as(JAVASCRIPT)
   }
 }
